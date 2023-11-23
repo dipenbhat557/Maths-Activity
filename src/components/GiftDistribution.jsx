@@ -40,8 +40,10 @@ const GiftDistribution = () => {
       Array(numStudents).fill(false)
     );
 
+    // Array.from({ length: numStudents }, () => []);
+
     console.log("exclusions from the function : ", exclusions);
-    console.log("The excllusion board before calling is : ", exclusionBoard);
+    console.log("The exclusion board before calling is : ", exclusionBoard);
 
     // Mark the forbidden places
     exclusions.forEach((exclusion, studentIndex) => {
