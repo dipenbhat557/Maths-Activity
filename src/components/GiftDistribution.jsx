@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 
 const GiftDistribution = () => {
@@ -6,61 +6,72 @@ const GiftDistribution = () => {
   const numGifts = useSelector((state) => state.numGifts);
   const exclusions = useSelector((state) => state.exclusions);
 
-  useEffect(() => {
-    console.log("Number of students : ", numStudents);
-    console.log("Number of gifts : ", numGifts);
-    console.log("Exclusions : ", exclusions);
-  }, [numStudents, numGifts, exclusions]);
-
-  // Function to calculate rook polynomial for a given board
   const calculateRookPolynomial = (board) => {
-    console.log("board while calculating rook : ", board);
-    const rows = board?.length;
-    const columns = board[0]?.length;
+    const rows = board.length;
+    const columns = board[0].length;
     const rookPolynomial = Array.from({ length: rows + 1 }, () => 0);
 
-    for (let i = 0; i <= rows; i++) {
-      rookPolynomial[i] = 1;
+    for (let subset = 0; subset < 1 << rows; subset++) {
+      let rowCount = 0;
+      let validSubset = true;
+
+      for (let i = 0; i < rows; i++) {
+        if (subset & (1 << i)) {
+          rowCount++;
+        }
+      }
+
       for (let j = 0; j < columns; j++) {
-        rookPolynomial[i] *= i - j > 0 ? i - j : 0;
+        let hasRook = false;
+        for (let i = 0; i < rows; i++) {
+          if (subset & (1 << i) && board[i][j]) {
+            hasRook = true;
+            break;
+          }
+        }
+
+        if (
+          hasRook ||
+          board.some((row, rowIndex) => subset & (1 << rowIndex) && row[j])
+        ) {
+          validSubset = false;
+          break;
+        }
+      }
+
+      if (validSubset) {
+        rookPolynomial[rowCount] += rowCount % 2 === 0 ? 1 : -1;
       }
     }
 
     return rookPolynomial;
   };
 
-  // Function to calculate total ways using inclusion-exclusion
   const calculateTotalWays = () => {
-    // If there are no students, return 0
     if (numStudents === 0) {
       return 0;
     }
 
     let exclusionBoard = Array.from({ length: numGifts }, () =>
-      Array(numStudents).fill(false)
+      Array.from({ length: numStudents }, () => false)
     );
 
-    // Array.from({ length: numStudents }, () => []);
-
-    console.log("exclusions from the function : ", exclusions);
-    console.log("The exclusion board before calling is : ", exclusionBoard);
-
-    // Mark the forbidden places
     exclusions.forEach((exclusion, studentIndex) => {
-      exclusion.forEach((excludedGiftIndex) => {
-        if (exclusionBoard[excludedGiftIndex - 1]) {
-          exclusionBoard[excludedGiftIndex - 1][studentIndex] = true;
+      exclusion.forEach((giftIndex) => {
+        // Make sure to check if giftIndex is within the range of numGifts
+        if (giftIndex >= 0 && giftIndex < numGifts) {
+          exclusionBoard[giftIndex][studentIndex] = true;
         }
       });
     });
-    console.log("The exclusion board is : ", exclusionBoard);
-    // Calculate rook polynomial for the exclusion board
+
+    console.log("Exclusion Board: ", exclusionBoard);
+
     const rookPolynomial = calculateRookPolynomial(exclusionBoard);
-    console.log("The rook polynomial is : ", rookPolynomial);
 
-    // Calculate total ways using inclusion-exclusion principle
+    console.log("Rook Polynomial: ", rookPolynomial);
+
     let totalWays = 0;
-
     for (let i = 0; i <= numStudents; i++) {
       totalWays += rookPolynomial[i] * Math.pow(-1, numStudents - i);
     }
@@ -68,7 +79,6 @@ const GiftDistribution = () => {
     return totalWays;
   };
 
-  // Calculate total ways
   const totalWays = calculateTotalWays();
 
   return (

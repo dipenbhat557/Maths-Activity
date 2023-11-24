@@ -49,7 +49,7 @@ const ExclusionDataEntry = () => {
                 onChange={(e) =>
                   handleExclusionChange(
                     studentIndex,
-                    giftNames[giftIndex],
+                    giftIndex,
                     e.target.checked
                   )
                 }
