@@ -5,76 +5,64 @@ const GiftDistribution = () => {
   const numStudents = useSelector((state) => state.numStudents);
   const numGifts = useSelector((state) => state.numGifts);
   const exclusions = useSelector((state) => state.exclusions);
+  const giftNames = useSelector((state) => state.giftNames);
 
-  const calculateRookPolynomial = (board) => {
-    const rows = board.length;
-    const columns = board[0].length;
-    const rookPolynomial = Array.from({ length: rows + 1 }, () => 0);
-
-    for (let subset = 0; subset < 1 << rows; subset++) {
-      let rowCount = 0;
-      let validSubset = true;
-
-      for (let i = 0; i < rows; i++) {
-        if (subset & (1 << i)) {
-          rowCount++;
-        }
-      }
-
-      for (let j = 0; j < columns; j++) {
-        let hasRook = false;
-        for (let i = 0; i < rows; i++) {
-          if (subset & (1 << i) && board[i][j]) {
-            hasRook = true;
-            break;
-          }
-        }
-
-        if (
-          hasRook ||
-          board.some((row, rowIndex) => subset & (1 << rowIndex) && row[j])
-        ) {
-          validSubset = false;
-          break;
-        }
-      }
-
-      if (validSubset) {
-        rookPolynomial[rowCount] += rowCount % 2 === 0 ? 1 : -1;
-      }
-    }
-
-    return rookPolynomial;
-  };
+  let finalGifts = [];
 
   const calculateTotalWays = () => {
     if (numStudents === 0) {
       return 0;
     }
 
-    let exclusionBoard = Array.from({ length: numGifts }, () =>
-      Array.from({ length: numStudents }, () => false)
+    let exclusionBoard = Array.from({ length: numStudents }, () =>
+      Array.from({ length: numGifts }, () => false)
     );
 
-    exclusions.forEach((exclusion, studentIndex) => {
-      exclusion.forEach((giftIndex) => {
+    exclusions?.forEach((exclusion, studentIndex) => {
+      exclusion?.forEach((giftIndex) => {
         // Make sure to check if giftIndex is within the range of numGifts
         if (giftIndex >= 0 && giftIndex < numGifts) {
-          exclusionBoard[giftIndex][studentIndex] = true;
+          exclusionBoard[studentIndex][giftIndex] = true;
         }
       });
     });
 
     console.log("Exclusion Board: ", exclusionBoard);
 
-    const rookPolynomial = calculateRookPolynomial(exclusionBoard);
+    let validGifts = Array.from({ length: numStudents }, () => []);
 
-    console.log("Rook Polynomial: ", rookPolynomial);
+    for (let i = 0; i < numStudents; i++) {
+      for (let j = 0; j < numGifts; j++) {
+        if (!exclusionBoard[i][j]) {
+          validGifts[i].push(giftNames[j]);
+        }
+      }
+    }
+
+    console.log("The list of valid gifts : ", validGifts);
 
     let totalWays = 0;
-    for (let i = 0; i <= numStudents; i++) {
-      totalWays += rookPolynomial[i] * Math.pow(-1, numStudents - i);
-    }
+
+    const generateCombinations = (currentIndex, currentCombination) => {
+      if (currentIndex === numStudents - 1) {
+        finalGifts.push([...currentCombination]);
+        return;
+      }
+
+      console.log("Current index is : ", currentIndex);
+
+      for (const gift of validGifts[currentIndex]) {
+        currentCombination.push(gift);
+        generateCombinations(currentIndex + 1, currentCombination);
+        currentCombination.pop();
+      }
+    };
+
+    generateCombinations(0, []);
+
+    console.log("All Possible Combinations: ", finalGifts);
+
+    totalWays = finalGifts?.length;
 
     return totalWays;
   };
@@ -84,7 +72,17 @@ const GiftDistribution = () => {
   return (
     <div>
       <h1>Gift Distribution</h1>
-      <p>Total Ways: {totalWays}</p>
+      <p>Total Possible Combinations are : </p>
+      {finalGifts.map((gift, index) => {
+        return (
+          <li key={index}>
+            {gift.map((item, index) => {
+              return `${gift[index]} `;
+            })}
+          </li>
+        );
+      })}
+      <p>Total No of Ways: {totalWays}</p>
     </div>
   );
 };
