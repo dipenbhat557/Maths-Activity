@@ -1,7 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const GiftDistribution = () => {
+  const navigate = useNavigate();
   const numStudents = useSelector((state) => state.numStudents);
   const numGifts = useSelector((state) => state.numGifts);
   const exclusions = useSelector((state) => state.exclusions);
@@ -71,18 +73,37 @@ const GiftDistribution = () => {
 
   return (
     <div>
-      <h1>Gift Distribution</h1>
-      <p>Total Possible Combinations are : </p>
+      <p className="my-10 text-[28px] font-semibold text-slate-800 w-full text-center">
+        Gift Distribution
+      </p>
+      <p className="text-slate-800 font-medium text-[18px] m-4">
+        Total Possible Combinations are :
+      </p>
       {finalGifts.map((gift, index) => {
         return (
-          <li key={index}>
+          <li className="m-4" key={index}>
             {gift.map((item, index) => {
               return `${gift[index]} `;
             })}
           </li>
         );
       })}
-      <p>Total No of Ways: {totalWays}</p>
+      <div className="flex w-full justify-center">
+        <p className="text-[22px] font-medium text-slate-800 my-3">
+          Total No of Ways:{" "}
+        </p>
+        <p className="font-semibold text-[24px] text-black my-3 ml-3">
+          {totalWays}
+        </p>
+      </div>
+      <div className="flex w-full justify-center mt-5">
+        <button
+          className="bg-slate-700 text-white rounded-md p-2 px-4"
+          onClick={() => navigate("/")}
+        >
+          Start Over
+        </button>
+      </div>
     </div>
   );
 };

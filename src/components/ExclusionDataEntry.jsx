@@ -37,13 +37,18 @@ const ExclusionDataEntry = () => {
 
   return (
     <div>
-      <h1>Exclusion Data Entry</h1>
+      <p className=" w-full text-center text-slate-800 font-semibold text-[38px] my-10">
+        Enter the data of gifts to be excluded :
+      </p>
       {Array.from({ length: numStudents }, (_, studentIndex) => (
-        <div key={studentIndex}>
-          <h3>{`Student ${studentIndex + 1}`}</h3>
+        <div className="m-5" key={studentIndex}>
+          <p className="text-slate-800 text-[18px] font-semibold mb-2">{`Student ${
+            studentIndex + 1
+          }`}</p>
           {Array.from({ length: numGifts }, (_, giftIndex) => (
             <div key={giftIndex}>
               <input
+                className="text-slate-800 mb-2"
                 type="checkbox"
                 id={`student${studentIndex + 1}_gift${giftIndex + 1}`}
                 onChange={(e) =>
@@ -55,6 +60,7 @@ const ExclusionDataEntry = () => {
                 }
               />
               <label
+                className="ml-2"
                 htmlFor={`student${studentIndex + 1}_gift${giftIndex + 1}`}
               >
                 {`Exclude Gift ${giftNames[giftIndex]} for Student ${
@@ -66,8 +72,14 @@ const ExclusionDataEntry = () => {
         </div>
       ))}
 
-      <br />
-      <button onClick={handleNext}>Next</button>
+      <div className="w-full justify-center flex items-center">
+        <button
+          className="text-white font-medium bg-green-300 p-1 px-3 hover:bg-green-500 rounded-md"
+          onClick={handleNext}
+        >
+          Continue &gt;&gt;
+        </button>
+      </div>
     </div>
   );
 };
